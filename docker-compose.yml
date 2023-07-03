@@ -8,6 +8,8 @@ services:
       - 8080:80
     depends_on:
       - db
+    networks:
+      - php-docker-network
   db:
     image: mysql:5.7
     environment:
@@ -19,6 +21,23 @@ services:
       - "6033:3306"   #Export external port 6033 mapped to internal of 3306
     volumes:
       - swmdbdata:/var/lib/mysql
+    networks:
+      - php-docker-network
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8181:80
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      - db
+    networks:
+      - php-docker-network
 volumes:
   swmdbdata:
     name: swmdbdata
+networks:
+  php-docker-network:
+    driver: bridge
+    name: php-docker-network
