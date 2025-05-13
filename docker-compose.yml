@@ -1,0 +1,54 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    volumes:
+      - .:/var/www
+    ports:
+      - "${APP_PORT:-9000}:9000"
+    depends_on:
+      - mysql
+
+  web:
+    image: nginx:alpine
+    container_name: laravel-nginx
+    ports:
+      - "${NGINX_PORT:-8000}:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: laravel-mysql
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    platform: linux/amd64
+    container_name: laravel-phpmyadmin
+    restart: always
+    ports:
+      - "${PMA_PORT:-8080}:80"
+    environment:
+      PMA_HOST: mysql
+#      if you want to auto login to phpMyAdmin, uncomment the following lines
+#      PMA_USER: ${DB_USERNAME:-laravel}    # Change this to the new MySQL user
+#      PMA_PASSWORD: ${DB_PASSWORD:-secret}  # Change this to the new password
+    depends_on:
+      - mysql
+
+volumes:
+  dbdata:
