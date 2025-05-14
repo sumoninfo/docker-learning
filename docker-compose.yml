@@ -28,9 +28,9 @@ services:
     ports:
       - "${DB_PORT:-3307}:3306"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel-app1-db}
       MYSQL_USER: ${DB_USERNAME:-laravel}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-1234}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
     volumes:
       - dbdata:/var/lib/mysql
@@ -50,5 +50,8 @@ services:
     depends_on:
       - mysql
 
+networks:
+    default:
+        name: laravel-shared-net
 volumes:
   dbdata:
